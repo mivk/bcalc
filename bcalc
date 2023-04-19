@@ -5,7 +5,7 @@ use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use File::Basename;
 
-my $VERSION=0.34;
+my $VERSION=0.34.1;
 
 my $debug   = 0;
 my $verbose = 0;
@@ -27,7 +27,7 @@ pod2usage(-verbose => 1) if ($h);
 
 $verbose++ if $debug;
 
-warn "$me v. $VERSION\n" if $verbose;
+warn "$me v. $VERSION\n" if ($debug || $verbose);
 
 my $calc_string = join('', @ARGV);
 $calc_string =~ s/(at|@)/ $1 /;
@@ -49,12 +49,12 @@ my ($time, $time_str, $time_unit, $size, $size_unit, $sz_more, $op, $speed, $spe
 if ( $calc_string =~ /^\s* ([\d\.']+) \s* (\D+)       ([\d\.']*) \s+ (at|\@) \s+ ([\d\.']+) \s* (\D.*)/x ) {
                            ($size,         $size_unit, $sz_more,      $op,           $speed,        $speed_unit)
 						 = ($1, $2, $3, $4, $5, $6);
-	warn "1: size = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " at ", "speed = $speed, speed_unit = $speed_unit\n" if $debug;
+	warn "1 : size = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " at ", "speed = $speed, speed_unit = $speed_unit\n" if $debug;
 }
 elsif ( $calc_string =~ /^\s* ([\d\.']+) \s* (\D+)       ([\d\.']*) \s+ (in) \s+ ([\d\. hms]+)/x ) {
                               ($size,         $size_unit, $sz_more,      $op,     $time_str)
 							= ($1, $2, $3, $4, $5);
-	warn "1: speed = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " in ", "time=$time_str\n" if $debug;
+	warn "1 : speed = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " in ", "time=$time_str\n" if $debug;
 } else {
 	pod2usage(-verbose => 1, -exitval => 'NOEXIT');
 	die "Error: Missing arguments. Nothing to calculate.\n";
@@ -64,7 +64,7 @@ elsif ( $calc_string =~ /^\s* ([\d\.']+) \s* (\D+)       ([\d\.']*) \s+ (in) \s+
 #
 #}
 
-warn "1: size = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " at ", "speed = $speed, speed_unit = $speed_unit\n" if $debug;
+warn "1 : size = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " at ", "speed = $speed, speed_unit = $speed_unit\n" if $debug;
 
 # size to bytes
 #if ($size_unit =~ s/(TB|terabytes?)/Terabytes/i) {
@@ -78,17 +78,17 @@ $size_unit =~ s/bytes?$/Bytes/i;
 $size_unit =~ s/B$/Bytes/;       # also case-sensitive
 
 # must be before checking for Mega
-warn "size_unit = '$size_unit'\n";
+warn "size_unit = '$size_unit'\n" if $debug;
 $size_unit =~ s/^h(ours?)?$/Hours/i;
 $size_unit =~ s/^m(i?n|inutes?)?$/Minutes/i;
 $size_unit =~ s/^s(ec|econds?)?$/Seconds/i;
-warn "size_unit = '$size_unit'\n";
+warn "size_unit = '$size_unit'\n" if ($debug || $verbose);
 
 $size_unit =~ s/^T(era)?/Tera/i;
 $size_unit =~ s/^G(iga)?/Giga/i;
 $size_unit =~ s/^M(ega)?(bits|Bytes)/Mega$2/i; # do not confuse with Minutes
 $size_unit =~ s/^K(ilo)?/Kilo/i;
-warn "size_unit = '$size_unit'\n";
+warn "size_unit = '$size_unit'\n" if ($debug || $verbose);
 
 $speed_unit =~ s/^T(era)?/Tera/i;
 $speed_unit =~ s/^G(iga)?/Giga/i;
@@ -106,30 +106,30 @@ $speed_unit =~ s/ per h(ours?)?/ per hour/i;
 $speed_unit =~ s/ per m(n|in|inutes?)?/ per minute/i;
 $speed_unit =~ s/ per s(econds?)?/ per second/i;
 
-warn "1b: ", commify($size), " $size_unit", ($sz_more ? " $sz_more " : ""), " at ", "$speed $speed_unit\n" if $verbose;
+warn "1b: ", commify($size), " $size_unit", ($sz_more ? " $sz_more " : ""), " at ", "$speed $speed_unit\n" if $debug;
 #warn "1b: size = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " at ", "speed = $speed, speed_unit = $speed_unit\n" if $debug;
 
 if ($size_unit =~ m/^Tera/) {
 	$size *= 10**12;
-	warn "2: size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
+	warn "2 : size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
 }
 elsif ($size_unit =~ m/Giga/) {
 	$size *= 10**9;
-	warn "3: size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
+	warn "3 : size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
 }
 elsif ($size_unit =~ m/Mega/) {
 	$size *= 10**6;
-	warn "4: size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
+	warn "4 : size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
 }
 elsif ($size_unit =~ m/Kilo/) {
 	$size *= 10**3;
-	warn "5: size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
+	warn "5 : size = ", commify($size), " bytes (from $size_unit)\n" if ($debug || $verbose);
 }
 elsif ($size_unit =~ s/^s(ec)?.*/seconds/i) {
 	$time = $size;
 	$size = 0;
 	$time_unit = $size_unit;
-	warn "6: time = $time $time_unit\n" if ($debug || $verbose);
+	warn "6 : time = $time $time_unit\n" if ($debug || $verbose);
 }
 elsif ($size_unit =~ s/^m(n|inutes?)?.*/minutes/i) { # m, mn, minute, minutes => "minutes"
 	$time = $size;
@@ -139,7 +139,7 @@ elsif ($size_unit =~ s/^m(n|inutes?)?.*/minutes/i) { # m, mn, minute, minutes =>
 	if ($sz_more) { # after minutes, assume seconds
 		$time += $sz_more;
 	}
-	warn "7: time = $time $time_unit (from $size_unit)\n" if ($debug || $verbose);
+	warn "7 : time = $time $time_unit (from $size_unit)\n" if ($debug || $verbose);
 }
 elsif ($size_unit =~ s/h(ours?)?.*/hours/i) {
 	$time = $size;
@@ -150,14 +150,14 @@ elsif ($size_unit =~ s/h(ours?)?.*/hours/i) {
 		$time += $sz_more * 60;
 	}
 
-	warn "8: time = $time $time_unit (from $size_unit)\n" if ($debug || $verbose);
+	warn "8 : time = $time $time_unit (from $size_unit)\n" if ($debug || $verbose);
 }
 
 
 
 # speed from bits to bytes
 if ($speed_unit =~ /bytes?/i || $speed_unit =~ /B/) {
-	warn "9: speed = ", commify($speed), " in Xbytes\n" if ($debug || $verbose);
+	warn "9 : speed = ", commify($speed), " in Xbytes\n" if ($debug || $verbose);
 }
 elsif ($speed_unit =~ /(bit|[tTgGmMkK]?(era|iga|ega|ilo)?b)/) {
 	$speed /= 8;
@@ -217,7 +217,7 @@ if ($time) {
 			$result = $r;
 		}
 	}
-	print commify($time), " $time_unit \@ ", commify($speed), " bytes per second = ",
+	warn  commify($time), " $time_unit \@ ", commify($speed), " bytes per second = ",
 		  commify($time * $speed), " bytes\n",
 		  "= ",  $time * $speed / 1000, " KB.\n",
 		  "= ",  $time * $speed / 1000000, " MB.\n",
@@ -245,7 +245,7 @@ else {
 		}
 	}
 
-	print commify($size), " bytes \@ ", commify($speed), " bytes per second = ",
+	warn  commify($size), " bytes \@ ", commify($speed), " bytes per second = ",
 		  commify($size/$speed), " seconds\n",
 		  "= ", $size/$speed/60, " minutes\n",
 		  "= ", $size/$speed/3600, " hours\n",
