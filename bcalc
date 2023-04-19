@@ -5,7 +5,7 @@ use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use File::Basename;
 
-my $VERSION=0.34.1;
+my $VERSION="0.34.1";
 
 my $debug   = 0;
 my $verbose = 0;
