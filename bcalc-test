@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $VERSION=0.01;
+my $debug=1;
+
+my %tests = (
+	'1.2h@1Mbpm'	=>	'9.00 Megabytes',
+	'1.2h@3600Mbph'	=>	'1944.00 Gigabytes',
+	'1.2h@3600Mbphour'	=>	'1944.00 Gigabytes',
+	'1.2h@3600Mbpmh'	=>	'32.40 Gigabytes',
+	'1.2h@3600Mbpmhour'	=>	'32.40 Gigabytes',
+	'1.2h@3Mbps'	=>	'1.62 Gigabytes',
+	'1.2h@600Mbpmn'	=>	'5.40 Gigabytes',
+	'1.2hour@3Mbps'	=>	'1.62 Gigabytes',
+	'1.2hours@3Mbps'	=>	'1.62 Gigabytes',
+	'10Mb@10Mbits per hour'	=>	'8.00 hours',
+	'10Mbits@10Mbits per hour'	=>	'8.00 hours',
+	'10Mbits@10Mbitsph'	=>	'8.00 seconds',
+	'6GB@150Tp'	=>	'',
+	'6GB@150Tps'	=>	'',
+	'7 G bytes @ 90 Kilobytes per second'	=>	'21.60 hours',
+	'7 G bytes at 90 Kilobytes per second'	=>	'21.60 hours',
+	'7 Giga bytes @ 90 Kilobytes per second'	=>	'21.60 hours',
+	'7 Giga bytes @ 90Kilobytespersecond'	=>	'21.60 hours',
+	'7 Giga bytes @ 90Kilobytesps'	=>	'21.60 hours',
+	'7GB@90KBps'	=>	'21.60 hours',
+);
+
+
+foreach my $t (sort keys %tests) {
+	my $result = `./bcalc $t`;
+	chomp $result;
+	$result =~ s/=\s+//;
+	if ($result eq $tests{$t}) {
+		print "ok: ";
+	}
+	else {
+		print "ERROR: ";
+	}
+	print "$t\t->\t$result\n";
+}

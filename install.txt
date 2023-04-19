@@ -1,0 +1,35 @@
+Debian based systems, using apt
+===============================
+
+    # You need to be root:
+    sudo -s
+
+    # Add the repository to your source list:
+    echo "deb http://alma.ch/apt/stable  ./" | tee /etc/apt/sources.list.d/alma.list
+
+    # Get and add the signing key
+    wget -O - http://alma.ch/apt/alma-apt.pub.gpg | apt-key add -
+
+    # Update
+    apt update
+
+    # Install
+    apt install bcalc
+
+Mac OS X with Homebrew
+======================
+
+    brew install mivk/tap/bcalc
+
+Manual install
+==============
+
+    curl -L https://github.com/mivk/bcalc/raw/master/bcalc > /usr/local/bin/ \
+      && chmod +x /usr/local/bin/bcalc
+
+Windows
+=======
+
+    Since it's just a simple Perl script, it should work in Windows
+    if you have Perl installed.
+
