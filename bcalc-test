@@ -41,3 +41,9 @@ foreach my $t (sort keys %tests) {
 	}
 	print "$t\t->\t$result\n";
 }
+
+
+__END__
+
+
+x mb mB MB Mb megab megaB megabit megabyte megabytes

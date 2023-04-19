@@ -1,4 +1,6 @@
 - wrong with stuff like Tbits !!
 
+- many parsing bugs to fix
+
 - better difference between verbose and debug
 

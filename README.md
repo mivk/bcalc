@@ -29,12 +29,12 @@ are valid size units:
     kB or kilobytes
     etc. with Mb, MB, Gb, GB, Tb, TB
 
-The greatest recognize size unit is TeraBytes. That should be enough for a couple
+The greatest recognized size unit is TeraBytes. That should be enough for a couple
 of years...
 
 # SPEED UNITS
 
-Speed units are the same as size untis, suffixed with "ps" (per second). For example:
+Speed units are the same as size units, suffixed with "ps" (per second). For example:
 
     bps, Mbps, MBps Megabytesps, ...
 

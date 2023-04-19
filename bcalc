@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
 use strict;
-use Getopt::Long;
+use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use File::Basename;
 
-my $VERSION=0.33;
+my $VERSION=0.34;
 
 my $debug   = 0;
 my $verbose = 0;
@@ -18,7 +18,8 @@ GetOptions(
             "help"  	=> \$help,
             "h|?"   	=> \$h,
 			"debug|d" 	=> \$debug,
-			"verbose|v" => \$verbose
+			"verbose|v" => \$verbose,
+			"version|V"	=> sub {print "$me $VERSION\n"; exit},
 );
 
 pod2usage(-verbose => 2) if $help;
@@ -33,31 +34,61 @@ $calc_string =~ s/(at|@)/ $1 /;
 
 warn "calc = $calc_string\n" if $debug;
 
-my ($time, $time_unit, $size, $size_unit, $sz_more, $speed, $speed_unit);
+my ($time, $time_str, $time_unit, $size, $size_unit, $sz_more, $op, $speed, $speed_unit);
 
-if ( $calc_string =~ /^\s* ([\d\.']+) \s* (\D+)       ([\d\.']*) \s+ (?:at|\@) \s+ ([\d\.']+) \s* (\D.*)/x ) {
-                           ($size,         $size_unit, $sz_more,                    $speed,        $speed_unit)
-						  = ($1, $2, $3, $4, $5);
+# bcalc -v 01:1 at 10Mbits per second should give error!
+# bcalc -v 1h1m at 10Mbits per second; done
+	#gives: Usage: /home/linuxbrew/.linuxbrew/bin/bcalc size size_unit @ speed speed_unit
+# WRONG: $ for time in 1:01 61m 3660s; do ./bcalc -v $time at 10Mbits per second; done
+#bcalc v. 0.33
+#1b: 1 : 01  at 10 Mega1bits per second
+#61m at ...
+# Wrong: 1b: 61 Mega at 10 Mega1bits per second
+#4: size = 61'000'000 bytes (from Mega)
+
+if ( $calc_string =~ /^\s* ([\d\.']+) \s* (\D+)       ([\d\.']*) \s+ (at|\@) \s+ ([\d\.']+) \s* (\D.*)/x ) {
+                           ($size,         $size_unit, $sz_more,      $op,           $speed,        $speed_unit)
+						 = ($1, $2, $3, $4, $5, $6);
 	warn "1: size = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " at ", "speed = $speed, speed_unit = $speed_unit\n" if $debug;
 }
-else {
+elsif ( $calc_string =~ /^\s* ([\d\.']+) \s* (\D+)       ([\d\.']*) \s+ (in) \s+ ([\d\. hms]+)/x ) {
+                              ($size,         $size_unit, $sz_more,      $op,     $time_str)
+							= ($1, $2, $3, $4, $5);
+	warn "1: speed = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " in ", "time=$time_str\n" if $debug;
+} else {
 	pod2usage(-verbose => 1, -exitval => 'NOEXIT');
 	die "Error: Missing arguments. Nothing to calculate.\n";
 }
 
+#if ($op eq 'in') {
+#
+#}
+
+warn "1: size = ", commify($size), ", size_unit = $size_unit, ", ($sz_more ? "sz_more=$sz_more, " : ""), " at ", "speed = $speed, speed_unit = $speed_unit\n" if $debug;
+
 # size to bytes
 #if ($size_unit =~ s/(TB|terabytes?)/Terabytes/i) {
-my $bits_bytes;
+#my $bits_bytes;
+
+## Order is important!
 
 $size_unit =~ s/bits?$/bits/i;
 $size_unit =~ s/b$/bits/;        # this one is case-sensitive
 $size_unit =~ s/bytes?$/Bytes/i;
 $size_unit =~ s/B$/Bytes/;       # also case-sensitive
 
+# must be before checking for Mega
+warn "size_unit = '$size_unit'\n";
+$size_unit =~ s/^h(ours?)?$/Hours/i;
+$size_unit =~ s/^m(i?n|inutes?)?$/Minutes/i;
+$size_unit =~ s/^s(ec|econds?)?$/Seconds/i;
+warn "size_unit = '$size_unit'\n";
+
 $size_unit =~ s/^T(era)?/Tera/i;
 $size_unit =~ s/^G(iga)?/Giga/i;
-$size_unit =~ s/^M(ega)?/Mega/i;
+$size_unit =~ s/^M(ega)?(bits|Bytes)/Mega$2/i; # do not confuse with Minutes
 $size_unit =~ s/^K(ilo)?/Kilo/i;
+warn "size_unit = '$size_unit'\n";
 
 $speed_unit =~ s/^T(era)?/Tera/i;
 $speed_unit =~ s/^G(iga)?/Giga/i;
@@ -232,6 +263,17 @@ sub commify {
 }
 
 =pod
+sub time2sec {
+	local $_ = join('', @_);
+	warn "time2sec '$_'\n" if $debug;
+	s/ //g;
+	my $s;
+	if () {
+	}
+}
+=cut
+
+=pod
 
 =head1 NAME
 
@@ -302,6 +344,10 @@ Print details of conversions done
 =item B<-d> or B<--debug>
 
 Print even more details of argument analysis and conversions
+
+=item B<-V> or B<--version>
+
+Print version and exit
 
 =back
 
