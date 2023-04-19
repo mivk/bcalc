@@ -24,7 +24,7 @@ Mac OS X with Homebrew
 Manual install
 ==============
 
-    curl -L https://github.com/mivk/bcalc/raw/master/bcalc > /usr/local/bin/ \
+    curl -L https://github.com/mivk/bcalc/raw/master/bcalc -o /usr/local/bin/bcalc \
       && chmod +x /usr/local/bin/bcalc
 
 Windows
